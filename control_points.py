@@ -36,7 +36,7 @@ class ControlPoints:
                     x, y = self.points[self.selecting_point_index]
                     keys = pygame.key.get_pressed()
                     if keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]:
-                        vel = 5
+                        vel = 50
                     else:
                         vel = 1
 
@@ -62,3 +62,6 @@ class ControlPoints:
                 color = (0,255,0)  # green
             pygame.draw.circle(self.screen, color, point, self.RADIUS, width=1)
             pygame.draw.circle(self.screen, color, point, 1)
+
+    def get_num(self):
+        return len(self.points)

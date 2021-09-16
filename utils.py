@@ -23,8 +23,34 @@ kelvin_table = {
 }
 
 
-def convert_color_temperature(img, temperature):
+def convert_color_temperature(img, temperature, mode='RGB'):
     r, g, b = kelvin_table[temperature]
-    matrix = np.array([r / 255, g / 255, b / 255])
+    if mode == 'RGB':
+        matrix = np.array([r / 255, g / 255, b / 255])
+    elif mode == 'BGR':
+        matrix = np.array([b / 255, g / 255, r / 255])
+    else:
+        raise ValueError
     img = img * matrix
     return img
+
+def equal_points(ps1, ps2):
+    for p1, p2 in zip(ps1, ps2):
+        if p1 != p2:
+            return False
+    return True
+
+def get_shift_affine(dx, dy):
+    return np.array([[1, 0, dx],
+                     [0, 1, dy]])
+
+def combine_affine(Ms):
+    '''
+    Ms: a list of matrices, which is the return value of cv2.getAffineTransform()
+    return: combined matrix, which can be used in cv2.warpAffine()
+    apply Ms[-1], then Ms[-2], ..., finally Ms[0]
+    '''
+    M_rst = np.diag([1,1,1])
+    for M in Ms:
+        M_rst = M_rst @ np.vstack([M, [0,0,1]])
+    return M_rst[:2].astype(np.float32)

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import pygame
 import numpy as np
-from skimage import io
 from control_points import ControlPoints
 from points import Points
-from utils import convert_color_temperature
+from utils import convert_color_temperature, equal_points, combine_affine, get_shift_affine
 from images import Images
+import cv2
 
 ## Global Setting ##
 # set image path, img1 is fixed, img2 can move
@@ -20,11 +20,10 @@ temperature2 = 2000
 x0, y0 = -750, -550
 
 ## Read Image ##
-img1 = io.imread(path1)
-img1 = convert_color_temperature(img1, temperature1)
-
-img2 = io.imread(path2)
-img2 = convert_color_temperature(img2, temperature2)
+img1 = cv2.imread(path1)
+img1 = convert_color_temperature(img1, temperature1, 'BGR')
+img2 = cv2.imread(path2)
+img2 = convert_color_temperature(img2, temperature2, 'BGR')
 
 ## Initialize Pygame ##
 pygame.init()
@@ -38,22 +37,68 @@ control_points = ControlPoints(screen)
 images = Images(screen, (x0, y0))
 
 ## Main Loop ##
+
+dx, dy = 0, 0
+prev_control_points = None
+prev_num = 0
+Ms = []
+
 run = True
 while run:
-    pygame.time.delay(50)
+    pygame.time.delay(100)
 
     ## Update ##
+    num = control_points.get_num()
+
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
             run = False
+        elif event.type == pygame.KEYDOWN and num == 0:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]:
+                vel = 50
+            else:
+                vel = 1
+
+            if event.key == pygame.K_a:
+                dx -= vel
+            elif event.key == pygame.K_d:
+                dx += vel
+            elif event.key == pygame.K_w:
+                dy -= vel
+            elif event.key == pygame.K_s:
+                dy += vel
+
     points.update(events)
     control_points.update(events)
     images.update(events)
+    if num == 3:
+        if prev_control_points == None:
+            pass
+        # record shift affine
+        elif prev_num == 0:
+            Ms.append(get_shift_affine(dx, dy))
+            dx, dy = 0, 0
+        # record 3-point affine
+        elif not equal_points(prev_control_points, control_points.points):
+            print('diff')
+            Ms.append(cv2.getAffineTransform(np.float32(prev_control_points), np.float32(control_points.points)))
+            dx, dy = 0, 0
+
+    print(len(Ms))
+    print(prev_control_points)
+    print(control_points.points)
+
+    prev_control_points = control_points.points[:]
+    prev_num = num
+
+    M = combine_affine(Ms[::-1])
+    img2_show = cv2.warpAffine(img2, M, (img2.shape[1], img2.shape[0]))
 
     ## Draw ##
     screen.fill((0, 0, 0))
-    images.draw(img1, img2)
+    images.draw(img1, img2_show, dx, dy)
     points.draw()
     control_points.draw()
     pygame.display.update()
