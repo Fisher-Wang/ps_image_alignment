@@ -3,21 +3,23 @@ import pygame
 import numpy as np
 from control_points import ControlPoints
 from points import Points
-from utils import convert_color_temperature, equal_points, combine_affine, get_shift_affine
+from utils import *
 from images import Images
 import cv2
 
 ## Global Setting ##
 # set image path, img1 is fixed, img2 can move
-# path1 = "imgs/1.png"
-# path2 = "imgs/2.png"
-path1 = "ToMatch/MER-503-36U3C(NT0170120068)_2021-09-11_20_35_31_138-9.png"
-path2 = "ToMatch/MER-503-36U3C(NT0170120068)_2021-09-11_20_36_27_261-51.png"
+path1 = "ToMatch/1.PNG"
+path2 = "ToMatch/2.PNG"
+# path1 = "ToMatch/MER-503-36U3C(NT0170120068)_2021-09-11_20_35_31_138-9.png"
+# path2 = "ToMatch/MER-503-36U3C(NT0170120068)_2021-09-11_20_36_27_261-51.png"
 # set color temperature
 temperature1 = 7000
 temperature2 = 2000
 # set origin point (top left corner)
-x0, y0 = -750, -550
+# x0, y0 = -750, -550
+x0, y0 = -10, -10
+# x0, y0 = 0, 0
 
 ## Read Image ##
 img1 = cv2.imread(path1)
@@ -45,7 +47,7 @@ Ms = []
 
 run = True
 while run:
-    pygame.time.delay(100)
+    pygame.time.delay(50)
 
     ## Update ##
     num = control_points.get_num()
@@ -82,18 +84,20 @@ while run:
             dx, dy = 0, 0
         # record 3-point affine
         elif not equal_points(prev_control_points, control_points.points):
-            print('diff')
-            Ms.append(cv2.getAffineTransform(np.float32(prev_control_points), np.float32(control_points.points)))
+            # print('diff')
+            Ms.append(get_3point_affine(prev_control_points, control_points.points, x0, y0))
             dx, dy = 0, 0
 
+    # print(dx, dy)
     print(len(Ms))
-    print(prev_control_points)
-    print(control_points.points)
+    print(Ms)
+    # print(prev_control_points)
+    # print(control_points.points)
 
     prev_control_points = control_points.points[:]
     prev_num = num
 
-    M = combine_affine(Ms[::-1])
+    M = combine_affine(Ms[::1])
     img2_show = cv2.warpAffine(img2, M, (img2.shape[1], img2.shape[0]))
 
     ## Draw ##

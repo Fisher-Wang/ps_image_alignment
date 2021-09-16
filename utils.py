@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 
 kelvin_table = {
@@ -54,3 +55,12 @@ def combine_affine(Ms):
     for M in Ms:
         M_rst = M_rst @ np.vstack([M, [0,0,1]])
     return M_rst[:2].astype(np.float32)
+
+def get_3point_affine(ps1, ps2, x0, y0):
+    ps1 = np.float32(ps1)
+    ps2 = np.float32(ps2)
+    ps1[:,0] = ps1[:,0] - x0
+    ps1[:,1] = ps1[:,1] - y0
+    ps2[:,0] = ps2[:,0] - x0
+    ps2[:,1] = ps2[:,1] - y0
+    return cv2.getAffineTransform(ps1, ps2)
