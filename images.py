@@ -22,10 +22,10 @@ class Images:
 
 
     def draw(self, img1, img2, dx, dy):
-        img1 = pygame.image.frombuffer(img1.astype(np.uint8), (img1.shape[1], img1.shape[0]), 'RGB').convert()
-        img1.set_alpha(128)
-        img2 = pygame.image.frombuffer(img2.astype(np.uint8), (img2.shape[1], img2.shape[0]), 'RGB').convert()
-        img2.set_alpha(128)
+        img1 = pygame.image.frombuffer(img1.astype(np.uint8), (img1.shape[1], img1.shape[0]), 'BGR').convert()
+        # img1.set_alpha(128)
+        img2 = pygame.image.frombuffer(img2.astype(np.uint8), (img2.shape[1], img2.shape[0]), 'BGR').convert()
+        # img2.set_alpha(128)
 
         x0, y0 = self.origin_point
         if self.show_state == 1:

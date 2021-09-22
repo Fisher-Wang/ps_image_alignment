@@ -35,15 +35,27 @@ def convert_color_temperature(img, temperature, mode='RGB'):
     img = img * matrix
     return img
 
+
+def sharpen(img, degree=5):
+    kernel = np.array([[0, -1, 0],
+                       [-1, degree, -1],
+                       [0, -1, 0]])
+    img_sharp = cv2.filter2D(img, cv2.CV_32F, kernel)
+    img_sharp = cv2.convertScaleAbs(img_sharp)
+    return img_sharp
+
+
 def equal_points(ps1, ps2):
     for p1, p2 in zip(ps1, ps2):
         if p1 != p2:
             return False
     return True
 
+
 def get_shift_affine(dx, dy):
     return np.array([[1, 0, dx],
                      [0, 1, dy]])
+
 
 def combine_affine(Ms):
     '''
@@ -51,16 +63,17 @@ def combine_affine(Ms):
     return: combined matrix, which can be used in cv2.warpAffine()
     apply Ms[-1], then Ms[-2], ..., finally Ms[0]
     '''
-    M_rst = np.diag([1,1,1])
+    M_rst = np.diag([1, 1, 1])
     for M in Ms:
-        M_rst = M_rst @ np.vstack([M, [0,0,1]])
+        M_rst = M_rst @ np.vstack([M, [0, 0, 1]])
     return M_rst[:2].astype(np.float32)
+
 
 def get_3point_affine(ps1, ps2, x0, y0):
     ps1 = np.float32(ps1)
     ps2 = np.float32(ps2)
-    ps1[:,0] = ps1[:,0] - x0
-    ps1[:,1] = ps1[:,1] - y0
-    ps2[:,0] = ps2[:,0] - x0
-    ps2[:,1] = ps2[:,1] - y0
+    ps1[:, 0] = ps1[:, 0] - x0
+    ps1[:, 1] = ps1[:, 1] - y0
+    ps2[:, 0] = ps2[:, 0] - x0
+    ps2[:, 1] = ps2[:, 1] - y0
     return cv2.getAffineTransform(ps1, ps2)
