@@ -8,6 +8,7 @@ from images import Images
 import cv2
 from rotate_point import RotatePoint
 import copy
+import os
 
 ## Global Setting ##
 # set image path, img1 is fixed, img2 can move
@@ -15,8 +16,20 @@ import copy
 # path2 = "ToMatch/2.PNG"
 # path1 = "ToMatch/MER-503-36U3C(NT0170120068)_2021-09-11_20_35_31_138-9.png"
 # path2 = "ToMatch/MER-503-36U3C(NT0170120068)_2021-09-11_20_36_27_261-51.png"
-path1 = 'ToMatch/ps_0918/1.png'
-path2 = 'ToMatch/ps_0918/26.png'
+
+# !!!
+# You need to change this!
+path_dic = {
+    'nutsball_abs' : '../../../research/diligent_v2/nutsBall/abs/MER-503-36U3C(NT0170120068)_2021-09-19_22_28_41_841-59.png',
+    'nutsball_Al' : '../../../research/diligent_v2/nutsBall/Al/MER-503-36U3C(NT0170120068)_2021-09-20_13_57_41_598-473.png',
+    'nutsball_bakelite' : '../../../research/diligent_v2/nutsBall/bakelite/MER-503-36U3C(NT0170120068)_2021-09-19_22_38_04_596-48.png',
+    'nutsball_Cu' : '../../../research/diligent_v2/nutsBall/Cu/MER-503-36U3C(NT0170120068)_2021-09-20_14_03_45_624-168.png',
+    'nutsball_nilon' : '../../../research/diligent_v2/nutsBall/nilon/MER-503-36U3C(NT0170120068)_2021-09-19_22_46_01_980-31.png',
+}
+path1 = path_dic['nutsball_bakelite']
+path2 = path_dic['nutsball_abs']
+result_dir = 'result'
+
 # set color temperature
 temperature1 = 10000
 temperature2 = 7000
@@ -52,6 +65,17 @@ prev_control_points = None
 prev_rotate_point = None
 prev_num = 0
 Ms = []
+M = None
+
+
+def save_info():
+    f = open(os.path.join(result_dir, 'nutsball_abs'), 'w+')
+    f.write('dx = {}, dy = {}\n'.format(dx, dy))
+    f.write('rotation_point = {}\n'.format(prev_rotate_point))
+    f.write('degree = %.1f\n' % (angle))
+    f.close()
+
+    np.save(os.path.join(result_dir, 'nutsball_abs.npy'), M)
 
 run = True
 while run:
@@ -63,6 +87,7 @@ while run:
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
+            save_info()
             run = False
         elif event.type == pygame.KEYDOWN and num == 0:
             keys = pygame.key.get_pressed()
@@ -147,3 +172,4 @@ while run:
     control_points.draw()
     rotate_point.draw()
     pygame.display.update()
+
