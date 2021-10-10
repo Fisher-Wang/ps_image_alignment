@@ -19,22 +19,28 @@ import os
 
 # !!!
 # You need to change this!
-path_dic = {
-    'nutsball_abs' : '../../../research/diligent_v2/nutsBall/abs/MER-503-36U3C(NT0170120068)_2021-09-19_22_28_41_841-59.png',
-    'nutsball_Al' : '../../../research/diligent_v2/nutsBall/Al/MER-503-36U3C(NT0170120068)_2021-09-20_13_57_41_598-473.png',
-    'nutsball_bakelite' : '../../../research/diligent_v2/nutsBall/bakelite/MER-503-36U3C(NT0170120068)_2021-09-19_22_38_04_596-48.png',
-    'nutsball_Cu' : '../../../research/diligent_v2/nutsBall/Cu/MER-503-36U3C(NT0170120068)_2021-09-20_14_03_45_624-168.png',
-    'nutsball_nilon' : '../../../research/diligent_v2/nutsBall/nilon/MER-503-36U3C(NT0170120068)_2021-09-19_22_46_01_980-31.png',
-}
-path1 = path_dic['nutsball_bakelite']
-path2 = path_dic['nutsball_abs']
+# path_dic = {
+#     'nutsball_abs' : '../../../research/diligent_v2/nutsBall/abs/MER-503-36U3C(NT0170120068)_2021-09-19_22_28_41_841-59.png',
+#     'nutsball_Al' : '../../../research/diligent_v2/nutsBall/Al/MER-503-36U3C(NT0170120068)_2021-09-20_13_57_41_598-473.png',
+#     'nutsball_bakelite' : '../../../research/diligent_v2/nutsBall/bakelite/MER-503-36U3C(NT0170120068)_2021-09-19_22_38_04_596-48.png',
+#     'nutsball_Cu' : '../../../research/diligent_v2/nutsBall/Cu/MER-503-36U3C(NT0170120068)_2021-09-20_14_03_45_624-168.png',
+#     'nutsball_nilon' : '../../../research/diligent_v2/nutsBall/nilon/MER-503-36U3C(NT0170120068)_2021-09-19_22_46_01_980-31.png',
+# }
+# path1 = path_dic['nutsball_bakelite']
+# path2 = path_dic['nutsball_abs']
 result_dir = 'result'
+
+path1 = '../../../research/diligent_v2/other/fans2/bakelitePNG/5.png'
+path2 = '../../../research/diligent_v2/other/fans2_aligned/absPNG/1.png'
+
+objname = 'fans2'
+texturename = 'abs'
 
 # set color temperature
 temperature1 = 10000
 temperature2 = 7000
 # set origin point (top left corner)
-x0, y0 = -750, -550
+x0, y0 = 0, 0
 # x0, y0 = -10, -10
 # x0, y0 = 0, 0
 
@@ -69,13 +75,13 @@ M = None
 
 
 def save_info():
-    f = open(os.path.join(result_dir, 'nutsball_abs'), 'w+')
+    f = open(os.path.join(result_dir, objname+'_'+texturename), 'w+')
     f.write('dx = {}, dy = {}\n'.format(dx, dy))
     f.write('rotation_point = {}\n'.format(prev_rotate_point))
     f.write('degree = %.1f\n' % (angle))
     f.close()
 
-    np.save(os.path.join(result_dir, 'nutsball_abs.npy'), M)
+    np.save(os.path.join(result_dir, objname+'_'+texturename+'.npy'), M)
 
 run = True
 while run:
